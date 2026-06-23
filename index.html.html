@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VFG Branch Backup Tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; color: #1a202c; }
+
+  .topbar { background: #1F4E78; color: #fff; padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; }
+  .topbar-brand i { font-size: 20px; opacity: 0.9; }
+  .topbar-right { font-size: 13px; opacity: 0.75; }
+  .live-badge { background: #48bb78; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .tabs { background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; padding: 0 2rem; }
+  .tab { padding: 14px 20px; font-size: 14px; font-weight: 500; color: #718096; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+  .tab:hover { color: #1F4E78; }
+  .tab.active { color: #1F4E78; border-bottom-color: #1F4E78; }
+  .tab i { font-size: 16px; }
+
+  .page { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a202c; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .card-title i { font-size: 18px; color: #1F4E78; }
+
+  .section-divider { font-size: 12px; font-weight: 600; color: #1F4E78; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.5rem 0 0.75rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+  .section-divider i { font-size: 14px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 13px; font-weight: 500; color: #4a5568; }
+  .required-star { color: #e53e3e; margin-left: 2px; }
+
+  input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 8px;
+    font-size: 14px; color: #1a202c; background: #fff; outline: none;
+    transition: border 0.15s, box-shadow 0.15s; font-family: inherit;
+  }
+  select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23718096' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+  input:focus, select:focus, textarea:focus { border-color: #1F4E78; box-shadow: 0 0 0 3px rgba(31,78,120,0.1); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .input-with-icon { position: relative; }
+  .input-with-icon i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #a0aec0; pointer-events: none; }
+  .input-with-icon input { padding-left: 34px; }
+
+  .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; font-family: inherit; }
+  .btn-primary { background: #1F4E78; color: #fff; }
+  .btn-primary:hover { background: #17406a; }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+  .btn-outline { background: #fff; color: #1F4E78; border: 1px solid #1F4E78; }
+  .btn-outline:hover { background: #EBF4FF; }
+  .btn-sm { padding: 7px 14px; font-size: 13px; }
+
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+  .alert-success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+  .alert-error { background: #fff5f5; color: #9b2c2c; border: 1px solid #fc8181; }
+  .alert-info { background: #ebf8ff; color: #2c5282; border: 1px solid #90cdf4; }
+
+  .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 1.25rem; }
+  .stat-label { font-size: 12px; color: #718096; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: #1a202c; }
+  .stat-sub { font-size: 12px; color: #a0aec0; margin-top: 4px; }
+
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: #1F4E78; }
+  thead th { color: #fff; padding: 11px 14px; text-align: left; font-weight: 500; font-size: 12px; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #f0f4f8; }
+  tbody tr:hover { background: #f7fafc; }
+  tbody td { padding: 10px 14px; color: #2d3748; }
+  tbody td.branch-name { font-weight: 600; color: #1F4E78; min-width: 130px; }
+  .month-cell { text-align: center; padding: 8px 4px !important; min-width: 56px; }
+
+  .dot { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: default; }
+  .dot-green { background: #48bb78; color: #fff; }
+  .dot-red { background: #fc8181; color: #fff; }
+  .dot-empty { background: #e2e8f0; color: #a0aec0; font-size: 11px; }
+
+  .legend-row { padding: 10px 14px; background: #f7fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 20px; font-size: 12px; color: #4a5568; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+
+  .filter-row { display: flex; gap: 1rem; margin-bottom: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .filter-row select { width: auto; min-width: 150px; }
+  .filter-label { font-size: 13px; color: #4a5568; font-weight: 500; white-space: nowrap; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #a0aec0; }
+  .empty-state i { font-size: 40px; margin-bottom: 0.75rem; display: block; }
+  .empty-state p { font-size: 14px; }
+
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+  .spinner-dark { width: 18px; height: 18px; border: 2px solid #e2e8f0; border-top-color: #1F4E78; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .history-item { padding: 14px 0; border-bottom: 1px solid #f0f4f8; }
+  .history-item:last-child { border-bottom: none; }
+  .history-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .history-branch { font-weight: 600; font-size: 14px; color: #1F4E78; }
+  .history-meta { font-size: 12px; color: #a0aec0; display: flex; gap: 12px; align-items: center; flex-shrink: 0; }
+  .history-submitter { font-size: 12px; color: #718096; margin-top: 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .history-submitter i { font-size: 13px; vertical-align: -1px; }
+  .history-badges { margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .badge-green { background: #c6f6d5; color: #22543d; }
+  .badge-red { background: #fed7d7; color: #742a2a; }
+  .badge-gray { background: #e2e8f0; color: #4a5568; }
+
+  .sync-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: #ebf8ff; border-radius: 8px; margin-bottom: 1rem; font-size: 12px; color: #2c5282; }
+  .sync-bar i { font-size: 14px; }
+
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .dashboard-grid { grid-template-columns: 1fr 1fr; }
+    .page { padding: 1rem; }
+    .tabs { padding: 0 0.5rem; overflow-x: auto; }
+    .topbar { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <i class="ti ti-database-export" aria-hidden="true"></i>
+    VFG Branch Backup Tracker
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    <div class="topbar-right">VisionFund Ghana · 2026</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('submit')"><i class="ti ti-send" aria-hidden="true"></i> Submit Backup</div>
+  <div class="tab" onclick="showPage('dashboard')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+  <div class="tab" onclick="showPage('history')"><i class="ti ti-history" aria-hidden="true"></i> History</div>
+</div>
+
+<!-- SUBMIT PAGE -->
+<div id="page-submit" class="page active">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-file-upload" aria-hidden="true"></i> Log Branch Backup</div>
+    <div id="submit-alert"></div>
+
+    <div class="section-divider"><i class="ti ti-user" aria-hidden="true"></i> Submitter Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="submitter-name">Full Name or Official Email <span class="required-star">*</span></label>
+        <div class="input-with-icon">
+          <i class="ti ti-user-circle" aria-hidden="true"></i>
+          <input type="text" id="submitter-name" placeholder="e.g. John Mensah or john@visionfund.org">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="submitter-phone">Phone Number <span class="required-star">*</span></label>
+        <div class="input-with-icon">
+          <i class="ti ti-phone" aria-hidden="true"></i>
+          <input type="tel" id="submitter-phone" placeholder="e.g. 0244 000 000">
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"><i class="ti ti-database" aria-hidden="true"></i> Backup Details</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="branch">Branch <span class="required-star">*</span></label>
+        <select id="branch">
+          <option value="">— Select branch —</option>
+          <option>ADA</option><option>ADENTA</option><option>AKATSI</option><option>AKOSOMBO</option>
+          <option>AMASAMAN</option><option>ARASAMAN</option><option>ASAMAN EXT</option><option>ASHAIMAN</option>
+          <option>ASSIN</option><option>BELGA</option><option>CAPE COAST</option><option>DAMONGO</option>
+          <option>DORMA</option><option>DUNKWA</option><option>GOASO</option><option>HOHOE</option>
+          <option>KINTAPO</option><option>KOFORIDUA</option><option>KUMASI</option><option>KWAHU</option>
+          <option>MAMPONG</option><option>MANKESSIM</option><option>NKAWKAW</option><option>NSAWAM</option>
+          <option>OBUASI</option><option>ODA</option><option>SALTPOND</option><option>SUNYANI</option>
+          <option>TAMALE</option><option>TECHIMAN</option><option>TEMA</option><option>TESHIE</option>
+          <option>WA</option><option>WINNEBA</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="month">Month <span class="required-star">*</span></label>
+        <select id="month">
+          <option value="">— Select month —</option>
+          <option>January</option><option>February</option><option>March</option><option>April</option>
+          <option>May</option><option>June</option><option>July</option><option>August</option>
+          <option>September</option><option>October</option><option>November</option><option>December</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label for="status">Backup Status <span class="required-star">*</span></label>
+        <select id="status">
+          <option value="">— Select status —</option>
+          <optgroup label="Single Week">
+            <option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option>
+          </optgroup>
+          <optgroup label="Two Weeks">
+            <option>Week 1, Week 2</option><option>Week 1, Week 3</option><option>Week 1, Week 4</option>
+            <option>Week 2, Week 3</option><option>Week 2, Week 4</option><option>Week 3, Week 4</option>
+          </optgroup>
+          <optgroup label="Three Weeks">
+            <option>Week 1, Week 2, Week 3</option><option>Week 1, Week 2, Week 4</option>
+            <option>Week 1, Week 3, Week 4</option><option>Week 2, Week 3, Week 4</option>
+          </optgroup>
+          <optgroup label="All Weeks">
+            <option>Week 1, Week 2, Week 3, Week 4</option>
+          </optgroup>
+          <optgroup label="Issues">
+            <option>No Backup</option><option>Failed</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label for="notes">Notes / Issues <span style="color:#a0aec0;font-weight:400">(optional)</span></label>
+        <textarea id="notes" placeholder="Describe any issues, errors, or remarks about this backup..."></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-primary" onclick="submitBackup()" id="submit-btn">
+        <i class="ti ti-check" aria-hidden="true"></i> Submit Backup
+      </button>
+      <button class="btn btn-outline" onclick="clearForm()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Clear
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Submissions</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">across all branches</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value" style="color:#38a169" id="stat-completed">—</div>
+      <div class="stat-sub">backup entries recorded</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Failed / No Backup</div>
+      <div class="stat-value" style="color:#e53e3e" id="stat-failed">—</div>
+      <div class="stat-sub">need attention</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <i class="ti ti-table" aria-hidden="true"></i> Branch Backup Status
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="loadFromSheet()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Refresh
+      </button>
+    </div>
+    <div id="sync-info" class="sync-bar" style="display:none">
+      <span><i class="ti ti-cloud-check" aria-hidden="true"></i> &nbsp;Live data from Google Sheet</span>
+      <span id="last-sync"></span>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Filter by month:</span>
+      <select id="filter-month" onchange="renderDashboard()">
+        <option value="all">All months</option>
+        <option>January</option><option>February</option><option>March</option><option>April</option>
+        <option>May</option><option>June</option><option>July</option><option>August</option>
+        <option>September</option><option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div class="table-wrap" id="dashboard-table">
+      <div class="empty-state"><span class="spinner-dark"></span><p style="margin-top:10px">Loading from Google Sheet...</p></div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><span class="legend-dot" style="background:#48bb78"></span> Completed</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#fc8181"></span> Failed / No Backup</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#e2e8f0"></span> No data yet</div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div id="page-history" class="page">
+  <div class="card">
+    <div class="card-title">
+      <i class="ti ti-history" aria-hidden="true"></i> Submission History
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="loadFromSheet()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Refresh
+      </button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Branch:</span>
+      <select id="filter-history-branch" onchange="renderHistory()">
+        <option value="all">All branches</option>
+        <option>ADA</option><option>ADENTA</option><option>AKATSI</option><option>AKOSOMBO</option>
+        <option>AMASAMAN</option><option>ARASAMAN</option><option>ASAMAN EXT</option><option>ASHAIMAN</option>
+        <option>ASSIN</option><option>BELGA</option><option>CAPE COAST</option><option>DAMONGO</option>
+        <option>DORMA</option><option>DUNKWA</option><option>GOASO</option><option>HOHOE</option>
+        <option>KINTAPO</option><option>KOFORIDUA</option><option>KUMASI</option><option>KWAHU</option>
+        <option>MAMPONG</option><option>MANKESSIM</option><option>NKAWKAW</option><option>NSAWAM</option>
+        <option>OBUASI</option><option>ODA</option><option>SALTPOND</option><option>SUNYANI</option>
+        <option>TAMALE</option><option>TECHIMAN</option><option>TEMA</option><option>TESHIE</option>
+        <option>WA</option><option>WINNEBA</option>
+      </select>
+      <span class="filter-label">Month:</span>
+      <select id="filter-history-month" onchange="renderHistory()">
+        <option value="all">All months</option>
+        <option>January</option><option>February</option><option>March</option><option>April</option>
+        <option>May</option><option>June</option><option>July</option><option>August</option>
+        <option>September</option><option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div id="history-list">
+      <div class="empty-state"><span class="spinner-dark"></span><p style="margin-top:10px">Loading from Google Sheet...</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtOZn2M7GgrJpGHgRZC7KsGPHQCBTmB7eaKgBBGVXXarACVZc8CtQrmx2FONp0F7ofPQ/exec";
+
+const BRANCHES = ["ADA","ADENTA","AKATSI","AKOSOMBO","AMASAMAN","ARASAMAN","ASAMAN EXT","ASHAIMAN","ASSIN","BELGA","CAPE COAST","DAMONGO","DORMA","DUNKWA","GOASO","HOHOE","KINTAPO","KOFORIDUA","KUMASI","KWAHU","MAMPONG","MANKESSIM","NKAWKAW","NSAWAM","OBUASI","ODA","SALTPOND","SUNYANI","TAMALE","TECHIMAN","TEMA","TESHIE","WA","WINNEBA"];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+let records = [];
+
+// Load data from Google Sheet via JSONP
+function loadFromSheet() {
+  return new Promise((resolve) => {
+    const callbackName = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    script.src = SCRIPT_URL + '?callback=' + callbackName;
+
+    window[callbackName] = function(data) {
+      document.head.removeChild(script);
+      delete window[callbackName];
+      if (data && data.records) {
+        records = data.records.map(r => ({
+          timestamp: r['Timestamp'] || '',
+          submitterName: r['Submitter Name'] || '',
+          submitterPhone: r['Phone Number'] || '',
+          branch: r['Branch'] || '',
+          month: r['Month'] || '',
+          status: r['Backup Status'] || '',
+          notes: r['Notes'] || ''
+        })).filter(r => r.branch && r.month);
+      }
+      const now = new Date();
+      document.getElementById('last-sync').textContent = 'Last synced: ' + now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+      document.getElementById('sync-info').style.display = 'flex';
+      renderDashboard();
+      renderHistory();
+      resolve();
+    };
+
+    script.onerror = function() {
+      document.head.removeChild(script);
+      delete window[callbackName];
+      // Fallback: try fetch with no-cors won't work, show message
+      document.getElementById('dashboard-table').innerHTML =
+        '<div class="empty-state"><i class="ti ti-wifi-off" aria-hidden="true"></i><p>Could not reach Google Sheet. Check your Apps Script deployment and try refreshing.</p></div>';
+      resolve();
+    };
+
+    document.head.appendChild(script);
+    setTimeout(() => {
+      if (window[callbackName]) {
+        // Timeout fallback - try fetch approach
+        delete window[callbackName];
+        fetchWithCors().then(resolve);
+      }
+    }, 5000);
+  });
+}
+
+async function fetchWithCors() {
+  try {
+    const res = await fetch(SCRIPT_URL, { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    if (data && data.records) {
+      records = data.records.map(r => ({
+        timestamp: r['Timestamp'] || '',
+        submitterName: r['Submitter Name'] || '',
+        submitterPhone: r['Phone Number'] || '',
+        branch: r['Branch'] || '',
+        month: r['Month'] || '',
+        status: r['Backup Status'] || '',
+        notes: r['Notes'] || ''
+      })).filter(r => r.branch && r.month);
+    }
+    renderDashboard();
+    renderHistory();
+  } catch(e) {
+    console.error('Fetch error:', e);
+  }
+}
+
+async function submitBackup() {
+  const name  = document.getElementById('submitter-name').value.trim();
+  const phone = document.getElementById('submitter-phone').value.trim();
+  const branch = document.getElementById('branch').value;
+  const month  = document.getElementById('month').value;
+  const status = document.getElementById('status').value;
+  const notes  = document.getElementById('notes').value.trim();
+
+  if (!name || !phone || !branch || !month || !status) {
+    showAlert('submit-alert','error','ti-alert-circle','Please fill in all required fields marked with *');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Saving to Google Sheet...';
+
+  const payload = { submitterName: name, submitterPhone: phone, branch, month, status, notes };
+
+  try {
+    // Use no-cors fetch to POST to Apps Script
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    // Optimistically add to local records for instant UI update
+    records.push({ ...payload, timestamp: new Date().toLocaleString() });
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Submit Backup';
+    showAlert('submit-alert','success','ti-circle-check',
+      `✓ Backup logged for ${branch} — ${month} (${status}). Saved to Google Sheet.`);
+    clearForm();
+
+    // Reload from sheet after short delay to confirm
+    setTimeout(() => loadFromSheet(), 2000);
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Submit Backup';
+    showAlert('submit-alert','error','ti-alert-circle','Submission failed. Please check your connection and try again.');
+  }
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  ['submit','dashboard','history'].forEach((n,i) => {
+    if (n === name) document.querySelectorAll('.tab')[i].classList.add('active');
+  });
+  if (name === 'dashboard') { loadFromSheet(); }
+  if (name === 'history')   { renderHistory(); }
+}
+
+function clearForm() {
+  ['submitter-name','submitter-phone','branch','month','status','notes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('submit-alert').innerHTML = '';
+}
+
+function showAlert(id, type, icon, msg) {
+  document.getElementById(id).innerHTML =
+    `<div class="alert alert-${type}"><i class="ti ${icon}" aria-hidden="true"></i>${msg}</div>`;
+  setTimeout(() => { document.getElementById(id).innerHTML = ''; }, 6000);
+}
+
+function isCompleted(s) { return s && s.toLowerCase().includes('week'); }
+function isFailed(s)    { return s && (s === 'No Backup' || s === 'Failed'); }
+
+function getLatestRecord(branch, month) {
+  const matches = records.filter(r => r.branch === branch && r.month === month);
+  return matches.length ? matches[matches.length - 1] : null;
+}
+
+function renderDashboard() {
+  const filterMonth = document.getElementById('filter-month').value;
+  let total = records.length, completed = 0, failed = 0;
+  records.forEach(r => {
+    if (isCompleted(r.status)) completed++;
+    if (isFailed(r.status)) failed++;
+  });
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-completed').textContent = completed;
+  document.getElementById('stat-failed').textContent = failed;
+
+  const showMonths = filterMonth === 'all' ? MONTHS : [filterMonth];
+  const showShort  = filterMonth === 'all' ? MONTHS_SHORT : [filterMonth.substring(0,3)];
+
+  let html = '<table><thead><tr><th>Branch</th>';
+  showShort.forEach(m => { html += `<th class="month-cell">${m}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  BRANCHES.forEach(branch => {
+    html += `<tr><td class="branch-name">${branch}</td>`;
+    showMonths.forEach(month => {
+      const rec = getLatestRecord(branch, month);
+      if (!rec) {
+        html += `<td class="month-cell"><div class="dot dot-empty" title="No data yet">—</div></td>`;
+      } else if (isCompleted(rec.status)) {
+        html += `<td class="month-cell"><div class="dot dot-green" title="${rec.status}&#10;By: ${rec.submitterName}"><i class="ti ti-check" style="font-size:13px" aria-hidden="true"></i></div></td>`;
+      } else {
+        html += `<td class="month-cell"><div class="dot dot-red" title="${rec.status}&#10;By: ${rec.submitterName}"><i class="ti ti-x" style="font-size:13px" aria-hidden="true"></i></div></td>`;
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('dashboard-table').innerHTML = html;
+}
+
+function renderHistory() {
+  const fb = document.getElementById('filter-history-branch').value;
+  const fm = document.getElementById('filter-history-month').value;
+  let filtered = [...records].reverse();
+  if (fb !== 'all') filtered = filtered.filter(r => r.branch === fb);
+  if (fm !== 'all') filtered = filtered.filter(r => r.month === fm);
+
+  if (!filtered.length) {
+    document.getElementById('history-list').innerHTML =
+      '<div class="empty-state"><i class="ti ti-inbox" aria-hidden="true"></i><p>No submissions found. Log a backup from the Submit tab.</p></div>';
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(r => {
+    const cls  = isCompleted(r.status) ? 'badge-green' : isFailed(r.status) ? 'badge-red' : 'badge-gray';
+    const icon = isCompleted(r.status) ? 'ti-check' : 'ti-x';
+    html += `<div class="history-item">
+      <div class="history-top">
+        <div>
+          <div class="history-branch">${r.branch} <span style="color:#a0aec0;font-weight:400">· ${r.month}</span></div>
+          <div class="history-submitter">
+            <span><i class="ti ti-user" aria-hidden="true"></i> ${r.submitterName || '—'}</span>
+            <span><i class="ti ti-phone" aria-hidden="true"></i> ${r.submitterPhone || '—'}</span>
+          </div>
+          <div class="history-badges">
+            <span class="badge ${cls}"><i class="ti ${icon}" style="font-size:11px" aria-hidden="true"></i> ${r.status}</span>
+            ${r.notes ? `<span style="font-size:12px;color:#718096;">${r.notes}</span>` : ''}
+          </div>
+        </div>
+        <div class="history-meta"><span>${r.timestamp}</span></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('history-list').innerHTML = html;
+}
+
+// Auto-refresh every 60 seconds
+setInterval(() => loadFromSheet(), 60000);
+
+// Initial load
+(async () => { await loadFromSheet(); })();
+</script>
+</body>
+</html>
