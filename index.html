@@ -31,7 +31,7 @@
   select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23718096' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
   input:focus, select:focus, textarea:focus { border-color: #1F4E78; box-shadow: 0 0 0 3px rgba(31,78,120,0.1); }
   textarea { resize: vertical; min-height: 80px; }
-  .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; font-family: inherit; text-decoration: none; }
+  .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; font-family: inherit; }
   .btn-primary { background: #1F4E78; color: #fff; }
   .btn-primary:hover { background: #17406a; }
   .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
@@ -94,9 +94,7 @@
 <body>
 
 <div class="topbar">
-  <div class="topbar-brand">
-    &#128196; VFG Branch Backup Tracker
-  </div>
+  <div class="topbar-brand">&#128196; VFG Branch Backup Tracker</div>
   <div style="display:flex;align-items:center;gap:10px">
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
     <div class="topbar-right">VisionFund Ghana · 2026</div>
@@ -133,38 +131,14 @@
         <label>Branch <span class="required-star">*</span></label>
         <select id="f-branch">
           <option value="">— Select branch —</option>
-          <option>ADA</option>
-          <option>ADENTA</option>
-          <option>AKATSI</option>
-          <option>AKOSOMBO</option>
-          <option>AMASAMAN</option>
-          <option>ASAMANKESE</option>
-          <option>ASHAIMAN</option>
-          <option>ASSIN</option>
-          <option>BOLGA</option>
-          <option>CAFE COAST</option>
-          <option>DAMONGO</option>
-          <option>DORMA</option>
-          <option>DUNKWA</option>
-          <option>GOASO</option>
-          <option>HOHOE</option>
-          <option>KINTANPO</option>
-          <option>KOFORIDUA</option>
-          <option>KUMASI</option>
-          <option>NKWANTA</option>
-          <option>OBUASI</option>
-          <option>SEFWI</option>
-          <option>SUNYANI</option>
-          <option>SWEDRU</option>
-          <option>TAKORADI</option>
-          <option>TAMALE</option>
-          <option>TARKWA</option>
-          <option>TECHIMAN</option>
-          <option>TEPA</option>
-          <option>TUMU</option>
-          <option>TWIFO</option>
-          <option>WA</option>
-          <option>WALEWALE</option>
+          <option>ADA</option><option>ADENTA</option><option>AKATSI</option><option>AKOSOMBO</option>
+          <option>AMASAMAN</option><option>ASAMANKESE</option><option>ASHAIMAN</option><option>ASSIN</option>
+          <option>BOLGA</option><option>CAFE COAST</option><option>DAMONGO</option><option>DORMA</option>
+          <option>DUNKWA</option><option>GOASO</option><option>HOHOE</option><option>KINTANPO</option>
+          <option>KOFORIDUA</option><option>KUMASI</option><option>NKWANTA</option><option>OBUASI</option>
+          <option>SEFWI</option><option>SUNYANI</option><option>SWEDRU</option><option>TAKORADI</option>
+          <option>TAMALE</option><option>TARKWA</option><option>TECHIMAN</option><option>TEPA</option>
+          <option>TUMU</option><option>TWIFO</option><option>WA</option><option>WALEWALE</option>
           <option>YENDI</option>
         </select>
       </div>
@@ -206,12 +180,8 @@
       </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="submitBackup()" id="submit-btn">
-        &#10003; Submit Backup
-      </button>
-      <button class="btn btn-outline" onclick="clearForm()">
-        &#8635; Clear
-      </button>
+      <button class="btn btn-primary" onclick="submitBackup()" id="submit-btn">&#10003; Submit Backup</button>
+      <button class="btn btn-outline" onclick="clearForm()">&#8635; Clear</button>
     </div>
   </div>
 </div>
@@ -272,38 +242,14 @@
       <span class="filter-label">Branch:</span>
       <select id="fh-branch" onchange="renderHistory()">
         <option value="all">All branches</option>
-        <option>ADA</option>
-        <option>ADENTA</option>
-        <option>AKATSI</option>
-        <option>AKOSOMBO</option>
-        <option>AMASAMAN</option>
-        <option>ASAMANKESE</option>
-        <option>ASHAIMAN</option>
-        <option>ASSIN</option>
-        <option>BOLGA</option>
-        <option>CAFE COAST</option>
-        <option>DAMONGO</option>
-        <option>DORMA</option>
-        <option>DUNKWA</option>
-        <option>GOASO</option>
-        <option>HOHOE</option>
-        <option>KINTANPO</option>
-        <option>KOFORIDUA</option>
-        <option>KUMASI</option>
-        <option>NKWANTA</option>
-        <option>OBUASI</option>
-        <option>SEFWI</option>
-        <option>SUNYANI</option>
-        <option>SWEDRU</option>
-        <option>TAKORADI</option>
-        <option>TAMALE</option>
-        <option>TARKWA</option>
-        <option>TECHIMAN</option>
-        <option>TEPA</option>
-        <option>TUMU</option>
-        <option>TWIFO</option>
-        <option>WA</option>
-        <option>WALEWALE</option>
+        <option>ADA</option><option>ADENTA</option><option>AKATSI</option><option>AKOSOMBO</option>
+        <option>AMASAMAN</option><option>ASAMANKESE</option><option>ASHAIMAN</option><option>ASSIN</option>
+        <option>BOLGA</option><option>CAFE COAST</option><option>DAMONGO</option><option>DORMA</option>
+        <option>DUNKWA</option><option>GOASO</option><option>HOHOE</option><option>KINTANPO</option>
+        <option>KOFORIDUA</option><option>KUMASI</option><option>NKWANTA</option><option>OBUASI</option>
+        <option>SEFWI</option><option>SUNYANI</option><option>SWEDRU</option><option>TAKORADI</option>
+        <option>TAMALE</option><option>TARKWA</option><option>TECHIMAN</option><option>TEPA</option>
+        <option>TUMU</option><option>TWIFO</option><option>WA</option><option>WALEWALE</option>
         <option>YENDI</option>
       </select>
       <span class="filter-label">Month:</span>
@@ -320,28 +266,108 @@
   </div>
 </div>
 
+<!-- Hidden iframe for form submission (bypasses CORS completely) -->
+<iframe name="hidden-form" style="display:none"></iframe>
+
 <script>
+// ── Google Form entry IDs (extracted from your pre-filled URL) ──────────────
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdjm0dryNzzYjd7c0ccIvH0IfdlGPoEobvqW3Wi4WAYKDarcQ/formResponse";
+const ENTRY = {
+  name:   "entry.1974399970",
+  phone:  "entry.1209659760",
+  branch: "entry.559650759",
+  month:  "entry.1912471654",
+  status: "entry.1811100329",
+  notes:  "entry.759425513"
+};
+
+// ── Apps Script URL for reading data ───────────────────────────────────────
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwtOZn2M7GgrJpGHgRZC7KsGPHQCBTmB7eaKgBBGVXXarACVZc8CtQrmx2FONp0F7ofPQ/exec";
+
 const BRANCHES = ["ADA","ADENTA","AKATSI","AKOSOMBO","AMASAMAN","ASAMANKESE","ASHAIMAN","ASSIN","BOLGA","CAFE COAST","DAMONGO","DORMA","DUNKWA","GOASO","HOHOE","KINTANPO","KOFORIDUA","KUMASI","NKWANTA","OBUASI","SEFWI","SUNYANI","SWEDRU","TAKORADI","TAMALE","TARKWA","TECHIMAN","TEPA","TUMU","TWIFO","WA","WALEWALE","YENDI"];
 const MONTHS   = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MONTHS_S = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 let records = [];
 
+// ── SUBMIT via hidden form POST to Google Forms (100% CORS-free) ───────────
+function submitBackup() {
+  var name   = document.getElementById('f-name').value.trim();
+  var phone  = document.getElementById('f-phone').value.trim();
+  var branch = document.getElementById('f-branch').value;
+  var month  = document.getElementById('f-month').value;
+  var status = document.getElementById('f-status').value;
+  var notes  = document.getElementById('f-notes').value.trim();
+
+  if (!name || !phone || !branch || !month || !status) {
+    showAlert('error', 'Please fill in all required fields marked with *');
+    return;
+  }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+  // Build a hidden form and submit it to Google Forms via iframe
+  var form = document.createElement('form');
+  form.action = FORM_ACTION;
+  form.method = 'POST';
+  form.target = 'hidden-form'; // submit into hidden iframe - no page reload
+
+  var fields = [
+    { name: ENTRY.name,   value: name   },
+    { name: ENTRY.phone,  value: phone  },
+    { name: ENTRY.branch, value: branch },
+    { name: ENTRY.month,  value: month  },
+    { name: ENTRY.status, value: status },
+    { name: ENTRY.notes,  value: notes  }
+  ];
+
+  fields.forEach(function(f) {
+    var input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = f.name;
+    input.value = f.value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+  // Optimistically add to local records for instant UI update
+  records.push({
+    timestamp:      new Date().toLocaleString('en-GB'),
+    submitterName:  name,
+    submitterPhone: phone,
+    branch:         branch,
+    month:          month,
+    status:         status,
+    notes:          notes
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '&#10003; Submit Backup';
+  showAlert('success', 'Backup logged for <strong>' + branch + '</strong> &mdash; ' + month + ' (' + status + '). Saved to Google Sheet &#10003;');
+  clearForm();
+
+  // Reload from sheet after 4s to confirm
+  setTimeout(loadData, 4000);
+}
+
+// ── LOAD data from Apps Script (JSONP) ────────────────────────────────────
 function loadData() {
   document.getElementById('dashboard-table').innerHTML =
     '<div class="empty-state"><span class="spinner-dark"></span><p>Loading from Google Sheet...</p></div>';
   document.getElementById('history-list').innerHTML =
     '<div class="empty-state"><span class="spinner-dark"></span><p>Loading...</p></div>';
 
-  const cbName = '__gs_' + Date.now();
-  const script = document.createElement('script');
+  var cbName = '__gs_' + Date.now();
+  var script = document.createElement('script');
   script.src = SHEET_URL + '?callback=' + cbName + '&t=' + Date.now();
 
-  const timer = setTimeout(function() {
+  var timer = setTimeout(function() {
     cleanup();
-    document.getElementById('dashboard-table').innerHTML =
-      '<div class="empty-state"><p style="color:#e53e3e">&#9888; Could not load data. Check Apps Script deployment and try refreshing.</p><br><button class="btn btn-outline" onclick="loadData()">&#8635; Try Again</button></div>';
     renderDashboard();
     renderHistory();
   }, 10000);
@@ -366,6 +392,7 @@ function loadData() {
           notes:          String(r['Notes']          || '')
         };
       }).filter(function(r) { return r.branch && r.month && r.status; });
+
       var t = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
       document.getElementById('sync-time').textContent = 'Synced ' + t;
       document.getElementById('sync-info').style.display = 'flex';
@@ -376,8 +403,6 @@ function loadData() {
 
   script.onerror = function() {
     cleanup();
-    document.getElementById('dashboard-table').innerHTML =
-      '<div class="empty-state"><p style="color:#e53e3e">&#9888; Connection error. Check your internet and try again.</p><br><button class="btn btn-outline" onclick="loadData()">&#8635; Try Again</button></div>';
     renderDashboard();
     renderHistory();
   };
@@ -385,51 +410,7 @@ function loadData() {
   document.head.appendChild(script);
 }
 
-function submitBackup() {
-  var name   = document.getElementById('f-name').value.trim();
-  var phone  = document.getElementById('f-phone').value.trim();
-  var branch = document.getElementById('f-branch').value;
-  var month  = document.getElementById('f-month').value;
-  var status = document.getElementById('f-status').value;
-  var notes  = document.getElementById('f-notes').value.trim();
-
-  if (!name || !phone || !branch || !month || !status) {
-    showAlert('error', 'Please fill in all required fields marked with *');
-    return;
-  }
-
-  var btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Saving...';
-
-  var payload = JSON.stringify({
-    submitterName: name, submitterPhone: phone,
-    branch: branch, month: month, status: status, notes: notes
-  });
-
-  fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: payload
-  }).then(function() {
-    records.push({
-      timestamp: new Date().toLocaleString('en-GB'),
-      submitterName: name, submitterPhone: phone,
-      branch: branch, month: month, status: status, notes: notes
-    });
-    btn.disabled = false;
-    btn.innerHTML = '&#10003; Submit Backup';
-    showAlert('success', 'Backup logged for ' + branch + ' &mdash; ' + month + ' (' + status + '). Saved to Google Sheet &#10003;');
-    clearForm();
-    setTimeout(loadData, 3000);
-  }).catch(function() {
-    btn.disabled = false;
-    btn.innerHTML = '&#10003; Submit Backup';
-    showAlert('error', 'Submission failed. Check your connection and try again.');
-  });
-}
-
+// ── UI helpers ─────────────────────────────────────────────────────────────
 function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -460,6 +441,7 @@ function getLatest(branch, month) {
   return matches.length ? matches[matches.length - 1] : null;
 }
 
+// ── RENDER dashboard ───────────────────────────────────────────────────────
 function renderDashboard() {
   var fm = document.getElementById('filter-month').value;
   var total = records.length, comp = 0, fail = 0;
@@ -483,11 +465,11 @@ function renderDashboard() {
     months.forEach(function(mo) {
       var rec = getLatest(b, mo);
       if (!rec) {
-        h += '<td class="month-cell"><div class="dot dot-empty" title="No data yet">—</div></td>';
+        h += '<td class="month-cell"><div class="dot dot-empty" title="No data yet">&#8212;</div></td>';
       } else if (isOK(rec.status)) {
-        h += '<td class="month-cell"><div class="dot dot-green" title="' + rec.status + ' | By: ' + rec.submitterName + '">&#10003;</div></td>';
+        h += '<td class="month-cell"><div class="dot dot-green" title="' + rec.status + ' | ' + rec.submitterName + '">&#10003;</div></td>';
       } else {
-        h += '<td class="month-cell"><div class="dot dot-red" title="' + rec.status + ' | By: ' + rec.submitterName + '">&#10007;</div></td>';
+        h += '<td class="month-cell"><div class="dot dot-red" title="' + rec.status + ' | ' + rec.submitterName + '">&#10007;</div></td>';
       }
     });
     h += '</tr>';
@@ -497,6 +479,7 @@ function renderDashboard() {
   document.getElementById('dashboard-table').innerHTML = h;
 }
 
+// ── RENDER history ─────────────────────────────────────────────────────────
 function renderHistory() {
   var fb = document.getElementById('fh-branch').value;
   var fm = document.getElementById('fh-month').value;
@@ -514,25 +497,18 @@ function renderHistory() {
   list.forEach(function(r) {
     var cls  = isOK(r.status) ? 'badge-green' : isBad(r.status) ? 'badge-red' : 'badge-gray';
     var icon = isOK(r.status) ? '&#10003;' : '&#10007;';
-    h += '<div class="history-item">';
-    h += '<div class="history-top">';
-    h += '<div>';
+    h += '<div class="history-item"><div class="history-top"><div>';
     h += '<div class="history-branch">' + r.branch + ' <span style="color:#a0aec0;font-weight:400">· ' + r.month + '</span></div>';
-    h += '<div class="history-sub">';
-    h += '<span>&#128100; ' + (r.submitterName || '—') + '</span>';
-    h += '<span>&#128222; ' + (r.submitterPhone || '—') + '</span>';
-    h += '</div>';
+    h += '<div class="history-sub"><span>&#128100; ' + (r.submitterName||'—') + '</span><span>&#128222; ' + (r.submitterPhone||'—') + '</span></div>';
     h += '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
     h += '<span class="badge ' + cls + '">' + icon + ' ' + r.status + '</span>';
     if (r.notes) h += '<span style="font-size:12px;color:#718096">' + r.notes + '</span>';
-    h += '</div></div>';
-    h += '<div class="history-meta">' + r.timestamp + '</div>';
-    h += '</div></div>';
+    h += '</div></div><div class="history-meta">' + r.timestamp + '</div></div></div>';
   });
   document.getElementById('history-list').innerHTML = h;
 }
 
-// Boot
+// ── Boot ───────────────────────────────────────────────────────────────────
 loadData();
 setInterval(loadData, 60000);
 </script>
